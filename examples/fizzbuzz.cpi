@@ -14,7 +14,7 @@ module fizzbuzz
 			elif i mod 5 == 0  { println("buzz"); }
 			else { i | print_i32; }
 
-      i += 1;
+      			i += 1;
 		}
 	}
 }
