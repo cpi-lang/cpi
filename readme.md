@@ -101,7 +101,7 @@ You can declare a named type and use it in place of the type it represents.  Use
 
 ```go
 type foo = i32;
-f : foo(13);
+f := foo(13);
 ```
 Named types are unique.  Even if two named types reference the same underlying type they are not the same.  They can be converted however:
 
