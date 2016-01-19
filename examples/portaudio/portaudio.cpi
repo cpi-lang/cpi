@@ -1,0 +1,71 @@
+require "../c.cpi"
+
+module portaudio
+{
+  type PaDeviceInfo =
+  {
+    structVersion : i32,
+    name : *i8,
+    hostApi : i32,
+    max_ic : i32,
+    max_oc : i32,
+    d_lil : f64,
+    d_lol : f64,
+		d_hil : f64,
+    d_hol : f64,
+    d_sr : f64
+  }
+
+  type PaStreamParameters =
+  {
+    device : i32,
+    channelCount : i32,
+    sampleFormat : i64,
+    s_l : f64,
+    h_info : *i8
+  }
+
+  type PaTestData =
+  {
+    s : *f32,
+    `left phase` : i32,
+    `right phase` : i32
+  }
+
+  type PaStreamCallbackTimeInfo =
+  {
+    inputBufferAdcTime : f64,
+    currentTime : f64,
+    outputBufferDacTime : f64
+  }
+
+  type PaCallbackData =
+  {
+    input : *i8,
+    output : *i8,
+    frameCount : i64,
+    timeInfo : *i8,
+    statusFlags : i64,
+    userData : *i8
+  }
+
+  Pa_Initialize : {} => i32;
+  Pa_GetDeviceInfo : {todo: i32} => *PaDeviceInfo;
+  Pa_GetDefaultOutputDevice : {} => i32;
+  Pa_StartStream : {todo: *i8} => i32;
+  Pa_StopStream : {todo: *i8} => i32;
+  Pa_CloseStream : {todo: *i8} => i32;
+  Pa_Terminate : {} => i32;
+  Pa_OpenStream : {
+    streamPtr : **i8,
+    inputParameters : *PaStreamParameters,
+    outputParameters : *PaStreamParameters,
+    sampleRate : f64,
+    framesPerBuffer : i64,
+    streamFlags : i64,
+    streamCallback : PaCallbackData => i32,
+    userData : *i8
+  } => i32;
+  Pa_SetStreamFinishedCallback : {ctx: *i8, callback: *i8 => i32} => i32
+  Pa_Sleep : {todo: i64} => {}
+}

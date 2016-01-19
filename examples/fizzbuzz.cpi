@@ -1,0 +1,20 @@
+require "c.cpi"
+
+module fizzbuzz
+{
+	main := {} =>
+	{
+		i ::= 0;
+		while i < 100
+		{
+			import c.io;
+
+			if i mod 15 == 0  { println("fizzbuzz"); }
+			elif i mod 3 == 0  { println("fizz"); }
+			elif i mod 5 == 0  { println("buzz"); }
+			else { i | print_i32; }
+
+      i += 1;
+		}
+	}
+}

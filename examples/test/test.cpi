@@ -1,0 +1,134 @@
+module test
+{
+  main := {} =>
+  {
+    require "../c.cpi"
+
+    import c.io;
+    import c.mem;
+    import c.conv;
+
+    -- deferred
+    defer { println("deferred"); }
+
+    `if test` := 3;
+    if `if test` == 3 { println("2"); }
+    else { println("3"); }
+
+    -- binary operators, precedence
+    buf := malloc(20 * i32(sizeof(i8)));
+    itoa(2 * 3 - 4, buf);
+    puts(buf);
+
+    -- procedures, shorthand and longhand return
+    inc := {n: i32} => n + 1;
+    incStruct := {n : i32} => #{n + 1}
+    dec := {n: i32} => { ret n - 1 }
+    decStruct := {n: i32} => { ret #{n - 1} }
+
+    -- declaration, assignment, procedure calling, pipe
+    print_i32 := {i : i32} => {
+      tmp ::= 1;
+      len ::= 1;
+      while tmp < i {
+        tmp = tmp * 10;
+        len = len + 1;
+      }
+
+      buf := malloc(len * i32(sizeof(i8)));
+      itoa(i, buf);
+      println(string(len, buf));
+    }
+
+    i :: i32
+    i = 0
+    print_i32(inc(inc(i)));
+
+		..#{i} | inc | dec | inc | inc | print_i32;
+		#{i} ..| inc | decStruct ..| inc | incStruct ..| print_i32;
+
+    -- anonymous tuple and dot on it
+		s1 := #{x : 1, y : 1};
+		print_i32(s1.x + s1.y);
+
+    -- argument destructuring
+    addS := {i: i32, j: i32} => i + j
+		print_i32(addS(3, -1));
+		print_i32(addS(..#{i : 3, j : -1}));
+    print_i32(addS(
+      ..({} => #{i: 1, j: 1})()
+    ));
+
+    -- anonymous procedure and immediately call
+    s2 := ({} => 2)()
+    print_i32(s2);
+
+    -- pointer stuff
+    s3 : *i32 = &2
+    print_i32(*s3);
+    print_i32(*(cast(*i32) cast(*i8) s3));
+    s4 := &s3
+    s5 := *s4
+    print_i32(*s5);
+
+    -- type declaration, type constructor/conversion, more destructuring
+		type FOO = {f : i32};
+		foo := FOO(2);
+		print_i32(foo.f)
+		print_i32(FOO(..FOO(..FOO(i32(i64(2))))).f);
+
+    if 2 == 3 { println("oops!"); }
+    else { print_i32(2); }
+
+    -- recursive types
+    module RecursiveTypes
+    {
+      type R1 = { val : i32, ptr : *R2 = nil };
+      type R2 = { val : i32, ptr : *R1 = nil };
+    }
+    import RecursiveTypes;
+    r1 := R1(33);
+
+    r2 := R2(55);
+    r1.ptr = &r2;
+    r2.ptr = &r1;
+    print_i32(r1.ptr.ptr.ptr.ptr.ptr.val);
+
+    type R3 = {i32, *R3 = nil};
+    r3 := R3(3);
+    r3.1 = &r3;
+    r3.0.0.0.0.1 | print_i32;
+
+    -- do
+    sum := {a : i32, b : i32} => a + b;
+    sum(3, do(r) {
+      inc := {n : i32} => n + 1;
+      r ::= #{6} ..| inc | inc;
+      if true { r += 8; }
+    }) | print_i32;
+
+    module TYPES
+    {
+      type R = {val : i32, ptr : *S = nil};
+      type S = {val : i32, ptr : *R = nil};
+      OMG := R(39);
+    }
+
+    TYPES.OMG.val | print_i32;
+
+    1_000_000 | print_i32;
+
+    a := &2;
+    if a? { *a|print_i32; }
+    else { "oh no!"|println; }
+
+    -- fibonacci
+    ({n : i32} => {
+      r ::= 1;
+      if n != 0 and n != 1 {
+        ret rec(n - 1) + rec(n - 2);
+      }
+      ret r;
+    })(5) | print_i32;
+  }
+}

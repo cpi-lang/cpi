@@ -1,0 +1,116 @@
+require "../c.cpi"
+require "portaudio.cpi"
+
+module test
+{
+  import c.io
+  import c.mem
+  import c.math
+  import portaudio
+
+  InitializeData := {`test data`: *PaTestData} =>
+  {
+    TABLE_SIZE := 200;
+
+    `test data`.s = cast(*f32) malloc(TABLE_SIZE * 4);
+
+    i ::= 0;
+    while i < TABLE_SIZE
+    {
+      `test data`.s(i) = sinf( (f32(i) / f32(TABLE_SIZE)) * PI * 2.0 );
+      i = i + 1;
+    }
+    `test data`.`left phase` = 0;
+    `test data`.`right phase` = 0;
+
+    Pa_Initialize();
+  }
+
+  FreeData := {`test data` : *PaTestData} => free(cast(*i8) `test data`.s)
+
+  base_callback := {callbackData : PaCallbackData} =>
+  {
+    TABLE_SIZE := 200;
+
+    out := cast(*f32) callbackData.output;
+
+    `callback data` := cast(*PaTestData) callbackData.userData;
+
+    `out index` ::= 0;
+    i ::= i64(0);
+    while i < callbackData.frameCount
+    {
+      out(`out index`) = `callback data`.s(`callback data`.`left phase`);
+      out(`out index` + 1) = `callback data`.s(`callback data`.`right phase`);
+
+      `callback data`.`left phase` = `callback data`.`left phase` + 1;
+      if `callback data`.`left phase` >= TABLE_SIZE
+      {
+        `callback data`.`left phase` -= TABLE_SIZE;
+      }
+
+      `callback data`.`right phase` = `callback data`.`right phase` + 3;
+      if `callback data`.`right phase` >= TABLE_SIZE
+      {
+        `callback data`.`right phase` -= TABLE_SIZE;
+      }
+
+      i += i64(1);
+      `out index` += 2;
+    }
+
+    ret 0
+  }
+
+  StreamFinished := {userData : *i8} =>
+  {
+    println("Stream Completed!");
+    ret 0
+  }
+
+  main := {} =>
+  {
+    streamPtr : *i8;
+
+    data : PaTestData;
+    InitializeData(&data);
+
+    outputParameters : PaStreamParameters;
+    outputParameters.device = Pa_GetDefaultOutputDevice()
+    outputParameters.channelCount = 2
+    outputParameters.sampleFormat = i64(1)
+    outputParameters.s_l = Pa_GetDeviceInfo(outputParameters.device).d_lol
+		outputParameters.h_info = cast(*i8) nil
+
+    ip := cast(*PaStreamParameters) nil;
+
+    `SAMPLE RATE` := f64(44100.0);
+    `FRAMES PER BUFFER` := i64(64);
+    paClipOff := i64(1);
+
+    Pa_OpenStream(&streamPtr,
+      ip,
+      &outputParameters,
+      `SAMPLE RATE`,
+      `FRAMES PER BUFFER`,
+      paClipOff,
+      base_callback,
+      cast(*i8) &data);
+
+    Pa_SetStreamFinishedCallback(streamPtr, StreamFinished);
+    Pa_StartStream(streamPtr)
+
+    println("Starting stream");
+    Pa_Sleep(i64(5000));
+
+    Pa_StopStream(streamPtr);
+    Pa_CloseStream(streamPtr);
+
+    Pa_Terminate();
+    println("Test finished");
+
+    FreeData(&data);
+
+    ret 0;
+  }
+}

@@ -1,0 +1,69 @@
+require "../c.cpi"
+require "glfw.cpi"
+
+module gl
+{
+  import c.mem;
+  import glfw;
+  import glfw.constants;
+
+  main := {} =>
+  {
+    glfwInit();
+
+    window_name := "Holy Shit!";
+    window := glfwCreateWindow(500, 500, window_name.ptr, nil, nil);
+    glfwMakeContextCurrent(window);
+
+    rotation ::= 0.0;
+  	width : i32;
+    height : i32;
+
+    while true
+    {
+    	if glfwWindowShouldClose(window)
+    	{
+    		glfwTerminate();
+    		ret 0;
+    	}
+
+      glfwGetFramebufferSize(window, &width, &height);
+      ratio := f32(width) / f32(height);
+      glViewport(0, 0, width, height);
+
+      glClear(COLOR_BUFFER_BIT);
+      glMatrixMode(PROJECTION);
+      glLoadIdentity();
+
+      glOrtho(-ratio, ratio, -1.0, 1.0, 1.0, -1.0);
+      glMatrixMode(MODELVIEW);
+      glLoadIdentity();
+
+      rotation = rotation + 5.0;
+      glRotatef(rotation, 0.2, 0.2, 0.2);
+
+      draw();
+
+      glfwSwapBuffers(window);
+      glfwPollEvents();
+    }
+
+    ret 0;
+  };
+
+  draw := {} =>
+  {
+    glBegin(TRIANGLES);
+
+    glColor3f(1.0, 0.62, 0.92);
+    glVertex3f(-0.6, -0.4, 0.0);
+
+    glColor3f(0.21, 0.96, 1.0);
+    glVertex3f(0.6, -0.4, 0.0);
+
+    glColor3f(1.0, 0.6, 0.0);
+    glVertex3f(0.0, 0.4, 0.0);
+
+    glEnd();
+  }
+}

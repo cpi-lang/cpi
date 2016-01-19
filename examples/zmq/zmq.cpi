@@ -1,0 +1,42 @@
+module zmq
+{
+	-- Straight translation of C bindings
+	module c
+	{
+		zmq_socket : {ctx: *{}, socket_type: i32} => *{};
+		zmq_ctx_new : {} => *{};
+		zmq_bind : {ctx: *{}, addr: *i8} => i32;
+		zmq_connect : {ctx: *{}, addr: *i8} => i32;
+		zmq_send : {ctx: *{}, msg: *i8, len: i32, flags: i32} => i32;
+		zmq_recv : {ctx: *{}, msg: *i8, len: i32, flags: i32} => i32;
+		zmq_close : {ctx: *{}} => i32;
+		zmq_ctx_destroy : {ctx: *{}} => i32;
+	}
+
+	import c;
+
+	-- Context
+	type Context = {ctx : *{}};
+	make_context := {} => Context(zmq_ctx_new());
+	destroy := {c : Context} => zmq_ctx_destroy(c.ctx);
+
+	-- Socket
+	REQ := 3
+	REP := 4
+
+	type Socket = {ctx : Context, sock : *{}};
+	make_socket := {socket_type : i32} =>
+	{
+		context := make_context();
+		ret Socket(context, zmq_socket(context.ctx, socket_type));
+	}
+
+	@scope(Socket) module SocketImpl
+	{
+		bind := {s : Socket, addr : string} => zmq_bind(s.sock, addr.ptr);
+		connect := {s : Socket, addr : string} => zmq_connect(s.sock, addr.ptr);
+		send := {s : Socket, buf: string, flags : i32 = 0} => zmq_send(s.sock, buf.ptr, buf.length, flags);
+		recv := {s : Socket, buf: *i8, len : i32, flags : i32 = 0} => zmq_recv(s.sock, buf, len, flags);
+		close := {s : Socket} => zmq_close(s.sock)
+	}
+}

@@ -1,0 +1,30 @@
+module glfw
+{
+  module constants
+  {
+    COLOR_BUFFER_BIT := 16384;
+    PROJECTION := 5889;
+    MODELVIEW := 5888;
+    TRIANGLES := 4;
+  }
+
+  glViewport : {p1: i32, p2: i32, p3: i32, p4: i32} => *i8;
+  glClear : {p1: i32} => *i8;
+  glMatrixMode : {p1: i32} => *i8;
+  glLoadIdentity : {} => *i8;
+  glOrtho : {p1: f32, p2: f32, p3: f32, p4: f32, p5: f32, p6: f32} => *i8;
+  glBegin : {p1: i32} => *i8;
+  glEnd : {} => *i8;
+  glColor3f : {p1: f32, p2: f32, p3: f32} => *i8;
+  glVertex3f : {p1: f32, p2: f32, p3: f32} => *i8;
+  glRotatef : {p1: f32, p2: f32, p3: f32, p4: f32} => *i8;
+
+  glfwInit : {} => *i8;
+  glfwCreateWindow : {p1: i32, p2: i32, p3: *i8, p4: *i8, p5: *i8} => *i8;
+  glfwMakeContextCurrent : {p1: *i8} => *i8;
+  glfwWindowShouldClose : {p1: *i8} => bool;
+  glfwTerminate : {} => *i8;
+  glfwGetFramebufferSize : {p1: *i8, p2: *i32, p3: *i32} => *i8;
+  glfwPollEvents : {} => *i8;
+  glfwSwapBuffers : {p1: *i8} => *i8;
+}

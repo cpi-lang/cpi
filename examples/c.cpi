@@ -1,0 +1,100 @@
+module c
+{
+  module io
+  {
+    puts : *i8 => i32;
+    gets : *i8 => *i8;
+    putchar : i8 => i32;
+    getchar : {} => i32;
+
+    strcat := {a : string, b : string} =>
+    {
+      length := a.length + b.length;
+      ptr := mem.malloc(length);
+      mem.memcpy(ptr, a.ptr, a.length);
+      mem.memcpy(&ptr(a.length), b.ptr, b.length);
+      ret string(length, ptr);
+    }
+    println := {s : string} =>
+    {
+      i := 0;
+      while i < s.length
+      {
+        putchar(s.ptr(i));
+        i += 1;
+      }
+      putchar(i8(0xA)); -- newline
+    }
+
+    print_i32 := {i : i32} =>
+    {
+      tmp ::= 1;
+      len ::= 1;
+      while tmp < i
+      {
+        tmp = tmp * 10;
+        len = len + 1;
+      }
+
+      buf := mem.malloc(len * i32(sizeof(i8)));
+      conv.itoa(i, buf);
+      println(string(len, buf));
+    }
+  }
+
+  module conv
+  {
+    itoa := {n : i32, buf : *i8} =>
+    {
+      digits := "0123456789-";
+      nn ::= n;
+
+      i := 0;
+      while nn > 0
+      {
+        nm := nn mod 10;
+        buf(i) = digits.ptr(nm);
+        nn = (nn - nm) / 10;
+        i += 1;
+      }
+
+      -- reverse
+      j := 0;
+      while j < (i / 2)
+      {
+        tmp := buf(j);
+        buf(j) = buf(i - j - 1);
+        buf(i - j - 1) = tmp;
+        j += 1;
+      }
+    }
+  }
+
+  module mem
+  {
+    malloc : {size: i32} => *i8;
+    realloc : {ptr : *i8, size : i32} => *i8;
+    free : {buf : *i8} => {};
+    memcpy : {to: *i8, from: *i8, size: i32} => *i8;
+    memset : {dest : *i8, value : i32, len : i32} => *i8;
+  }
+
+  module math
+  {
+    PI := 3.141592654
+
+    pow : {first : f64, second : f64} => f64;
+
+		sin : {n : f64} => f64;
+    sinf : {n : f32} => f32;
+
+		cos : {n : f64} => f64;
+		cosf : {n : f32} => f32;
+  }
+
+  -- todo(chad): better / more consistent name? (i.e. what header file is this in cstdlib)
+  module system
+  {
+    sleep : {todo: i32} => *i8;
+  }
+}

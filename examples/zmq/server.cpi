@@ -1,0 +1,28 @@
+require "../c.cpi"
+require "zmq.cpi"
+
+module server
+{
+	import c.io;
+	import c.mem;
+
+	import zmq;
+
+	main := {} =>
+	{
+		responder := make_socket(REP);
+
+		responder|bind("tcp://*:5555");
+
+		buffer := malloc(10);
+
+		while true
+		{
+			responder|recv(buffer, 10);
+			println("Received"); puts(buffer);
+			responder|send("FROM SERVER");
+		}
+
+		ret 0;
+	}
+}
