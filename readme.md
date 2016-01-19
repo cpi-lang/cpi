@@ -6,7 +6,7 @@ cpi doesn't stand for anything.  It's not really an idealist.
 
 ## What's the point?
 I wanted a language that was pretty much like C but with more stuff I wanted and less stuff I didn't want.  So I made one. Yeah yeah, pretty much everyone's story I know.
-It compiles to llvm ir (literally, it spits out a .ll file) which means it interoprates with C seamlessly. 
+It compiles to llvm ir (literally, it spits out a .ll file). 
 I know the world doesn't need another programming language but I actually think there's some cool ideas in here.  And it is such a fun project!
 I find it nicer to work with than C for the same kinds of tasks, and it is as performant.
 
@@ -31,7 +31,7 @@ module fizzbuzz
 			elif i mod 5 == 0  { println("buzz"); }
 			else { i | print_i32; }
 
-      i += 1;
+      			i += 1;
 		}
 	}
 }
