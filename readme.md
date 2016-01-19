@@ -219,6 +219,13 @@ add_one := {n : i32} => {
 add_one := {n : i32} => n + 1;
 ```
 
+#### Multiple return values
+People go absolutely nuts for multiple return values.  It's really easy in this language, just return an anonymous struct:
+
+```go
+multiple_return := {n : i32} => #{n, n + 1, n + 2}
+```
+
 #### Default arguments:
 
 ```go
