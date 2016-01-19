@@ -370,7 +370,7 @@ This problem is normally solved using objects and vtables but that's been done a
 enter the `@scope(typename)` attribute.  If you stick this onto any module then whenever you use something of type `typename` as the lhs of a pipe,
 everything in that module is imported into scope but only for the context of that pipe.  It might be easier to show a contrived example:
 
-```
+```go
 type foo = {}; -- empty struct is kind of like a void type in C
 @scope(foo) module foo_impl
 {
@@ -383,7 +383,7 @@ f | say_hi;
 See how we piped `f` to `say_hi` even though `say_hi` was not in scope? That's because the module `foo_impl` *was* in scope and since it was attributed with 
 `@scope(foo)` and `f` was a `foo`.  The neat thing about these is that they are scoped, so I can do stuff like this:
 
-```
+```go
 type foo = {};
 
 @scope(foo) module foo_impl {
@@ -495,7 +495,8 @@ Works about like you'd expect:
 
 ```go
 i := 60 
-while i < 65 {
+while i < 65 
+{
 	putchar(char(i));
 	i += 1;
 }
@@ -507,9 +508,11 @@ That's right, I know they're considered harmful and all but screw that let's liv
 
 ```go
 a := 3;
-while true {
+while true 
+{
 	a += 1;
-	if a >= 10 {
+	if a >= 10 
+	{
 		->break;
 	}
 }
